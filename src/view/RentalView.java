@@ -30,7 +30,7 @@ public class RentalView {
                         "Plat Nomor: " + k.getPlatNomor() +
                                 "| Merk: " + k.getMerk() +
                                 "| Jenis: " + k.getJenis() +
-                                "| Tarif Per Hari: " + Format.rupiah(k.getTarifPerhari()) +
+                                "| Tarif Per Hari: " + Format.rupiah(k.getTarifPerHari()) +
                                 "| Tersedia: " + (k.isTersedia() ? "Ya" : "Tidak"));
             }
         }
