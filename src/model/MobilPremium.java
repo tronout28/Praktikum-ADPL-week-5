@@ -1,5 +1,7 @@
 package model;
 
+
+
 /*
 [LSP]   MobilPremium bisa menggantikan Kendaraan di mana pun tanpa crash.
         Syarat minimal 3 hari tidak lagi "disembunyikan" lewat exception,
@@ -12,6 +14,7 @@ Pemilik rental ingin menambah Mobil Premium (misalnya Alphard) dengan dua aturan
 public class MobilPremium extends Mobil {
         private static final long ASURANSI_PREMIUM = 100000;
         private static final int MINIMAL_HARI = 3;
+         private static final long UANG_JAMINAN = 2000000;
 
         public MobilPremium(String platNomor, String merk, long tarifPerHari) {
                 super(platNomor, merk, tarifPerHari);
@@ -31,5 +34,15 @@ public class MobilPremium extends Mobil {
         @Override
         public long hitungBiaya(int hari) {
                 return super.hitungBiaya(hari) + ASURANSI_PREMIUM;
+        }
+
+         @Override 
+        public String getGolonganSIM(){
+                return "A";
+        }
+
+        @Override 
+        public  long getUangJaminan(){
+                return UANG_JAMINAN;
         }
 }
