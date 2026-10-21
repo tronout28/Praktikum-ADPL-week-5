@@ -2,6 +2,8 @@ package controller;
 
 import model.Penyewaan;
 import model.PenyewaanRepository;
+import model.WajibJaminan;
+import model.WajibSIM;
 
 import java.util.List;
 
@@ -15,10 +17,23 @@ import view.Format;
 
 public class RentalController {
 
-    private final KendaraanRepository kendaraanRepo = new KendaraanRepository();
-    private final PenyewaanRepository penyewaanRepo = new PenyewaanRepository();
-    private final RentalView view = new RentalView();
-    private final StrukView strukView = new StrukView();
+    private final KendaraanRepository kendaraanRepo;
+    private final PenyewaanRepository penyewaanRepo;
+    private final RentalView view;
+    private final StrukView strukView;
+    private final KendaraanFactory kendaraanFactory;
+
+    public RentalController(KendaraanRepository kendaraanRepository,
+            PenyewaanRepository penyewaanRepository,
+            RentalView view,
+            StrukView strukView,
+            KendaraanFactory kendaraanFactory) {
+        this.kendaraanRepo = kendaraanRepository;
+        this.penyewaanRepo = penyewaanRepository;
+        this.view = view;
+        this.strukView = strukView;
+        this.kendaraanFactory = kendaraanFactory;
+    }
 
     public void tambahDataAwal(Kendaraan kendaraan) {
         kendaraanRepo.tambah(kendaraan);
@@ -27,14 +42,14 @@ public class RentalController {
     public void jalankan() {
         while (true) {
             view.tampilkanMenu();
-            int pilihan = (int) view.bacaAngka("Pilih menu");
+            String pilihan = view.tampilkanMenu();
             switch (pilihan) {
-                case 1 -> view.tampilkanDaftarKendaraan(kendaraanRepo.semua());
-                case 2 -> tambahKendaraan();
-                case 3 -> sewaKendaraan();
-                case 4 -> kembalikanKendaraan();
-                case 5 -> view.tampilkanRiwayat(penyewaanRepo.semua());
-                case 0 -> {
+                case "1" -> view.tampilkanDaftarKendaraan(kendaraanRepo.semua());
+                case "2" -> tambahKendaraan();
+                case "3" -> sewaKendaraan();
+                case "4" -> kembalikanKendaraan();
+                case "5" -> view.tampilkanRiwayat(penyewaanRepo.semua());
+                case "0" -> {
                     view.tampilkanPesan("Terima kasih telah menggunakan aplikasi ini.");
                     return;
                 }
@@ -51,8 +66,8 @@ public class RentalController {
         }
         String merk = view.bacaTeks("Merk");
         // [OCP] Daftar jenis diambil dari Factory, bukan ditulis manual di Controller.
-        String jenis = view.bacaTeks("Jenis (" + String.join("/", KendaraanFactory.JENIS) + ")").toUpperCase();
-        if (!List.of(KendaraanFactory.JENIS).contains(jenis)) {
+        String jenis = view.bacaTeks("Jenis (" + String.join("/", kendaraanFactory.daftarJenis()) + ")").toUpperCase();
+        if (!kendaraanFactory.daftarJenis().contains(jenis)) {
             view.tampilkanPesan("Jenis tidak dikenal.");
             return;
         }
@@ -61,7 +76,7 @@ public class RentalController {
             view.tampilkanPesan("Tarif harus lebih dari 0.");
             return;
         }
-        kendaraanRepo.tambah(KendaraanFactory.buat(jenis, plat, merk, tarif));
+        kendaraanRepo.tambah(kendaraanFactory.buat(jenis, plat, merk, tarif));
         view.tampilkanPesan("Kendaraan berhasil ditambahkan.");
     }
 
@@ -75,9 +90,30 @@ public class RentalController {
         }
 
         String nama = view.bacaTeks("Masukkan Nama Penyewa");
+
+        if (kendaraan instanceof WajibSIM wajibSIM) {
+            String sim = view.bacaTeks("Golongan SIM Penyewa");
+
+            if (sim.equalsIgnoreCase(wajibSIM.getGolonganSIM())) {
+                view.tampilkanPesan(kendaraan.getMerk()
+                        + "Wajib SIM"
+                        + wajibSIM.getGolonganSIM());
+            }
+            ;
+            return;
+
+        }
         int hari = (int) view.bacaAngka("Masukkan Lama Sewa (dalam hari)");
-        if (hari < 1) {
-            view.tampilkanPesan("Lama sewa minimal 1 hari.");
+
+        if (kendaraan instanceof WajibJaminan wajibJaminan) {
+            if (!view.konfirmasiUangJaminan(wajibJaminan.getUangJaminan())) {
+                view.tampilkanPesan("Penyewaan dibatalkan");
+                return;
+            }
+        }
+        if (hari < kendaraan.getMinimalHari()) {
+            view.tampilkanPesan(kendaraan.getMerk() + " minimal disewa "
+                    + kendaraan.getMinimalHari() + " hari.");
             return;
         }
 

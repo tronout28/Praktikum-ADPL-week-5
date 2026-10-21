@@ -1,8 +1,9 @@
 package model;
 
 //[OCP] Ekstensi dari Kendaraan: aturan diskon motor tinggal di kelasnya sendiri.
-public class Motor extends Kendaraan {
+public class Motor extends Kendaraan implements WajibSIM {
         private static final int HARI_DISKON = 7;
+        // private static final long UANG_JAMINAN = 
 
         public Motor(String platNomor, String merk, long tarifPerHari) {
                 super(platNomor, merk, tarifPerHari);
@@ -21,4 +22,14 @@ public class Motor extends Kendaraan {
                 }
                 return total;
         }
+
+        @Override 
+        public String getGolonganSIM(){
+                return "C";
+        }
+
+        // @Override 
+        // public  long getUangJaminan(){
+        //         return UANG_JAMINAN;
+        // }
 }
