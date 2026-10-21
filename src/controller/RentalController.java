@@ -41,7 +41,6 @@ public class RentalController {
 
     public void jalankan() {
         while (true) {
-            view.tampilkanMenu();
             String pilihan = view.tampilkanMenu();
             switch (pilihan) {
                 case "1" -> view.tampilkanDaftarKendaraan(kendaraanRepo.semua());
@@ -94,16 +93,21 @@ public class RentalController {
         if (kendaraan instanceof WajibSIM wajibSIM) {
             String sim = view.bacaTeks("Golongan SIM Penyewa");
 
-            if (sim.equalsIgnoreCase(wajibSIM.getGolonganSIM())) {
-                view.tampilkanPesan(kendaraan.getMerk()
-                        + "Wajib SIM"
-                        + wajibSIM.getGolonganSIM());
+            if (!sim.equalsIgnoreCase(wajibSIM.getGolonganSIM())) {
+                view.tampilkanPesan("Penyewaan gagal! " + kendaraan.getMerk()
+                        + " membutuhkan SIM Golongan "
+                        + wajibSIM.getGolonganSIM() + ".");
+                return;
             }
-            ;
-            return;
-
         }
+
         int hari = (int) view.bacaAngka("Masukkan Lama Sewa (dalam hari)");
+
+        if (hari < kendaraan.getMinimalHari()) {
+            view.tampilkanPesan(kendaraan.getMerk() + " minimal disewa "
+                    + kendaraan.getMinimalHari() + " hari.");
+            return;
+        }
 
         if (kendaraan instanceof WajibJaminan wajibJaminan) {
             if (!view.konfirmasiUangJaminan(wajibJaminan.getUangJaminan())) {
@@ -111,18 +115,12 @@ public class RentalController {
                 return;
             }
         }
-        if (hari < kendaraan.getMinimalHari()) {
-            view.tampilkanPesan(kendaraan.getMerk() + " minimal disewa "
-                    + kendaraan.getMinimalHari() + " hari.");
-            return;
-        }
 
         long totalBiaya = kendaraan.hitungBiaya(hari);
         Penyewaan sewa = new Penyewaan(penyewaanRepo.buatIdBaru(), nama, kendaraan, hari, totalBiaya);
         penyewaanRepo.tambah(sewa);
         kendaraan.setTersedia(false);
         strukView.cetak(sewa);
-
     }
 
     public void kembalikanKendaraan() {
@@ -136,10 +134,8 @@ public class RentalController {
         }
 
         sewa.selesai();
-        sewa.getKendaraan().setTersedia(true);
         view.tampilkanPesan("Kendaraan " + sewa.getKendaraan().getMerk() + " berhasil dikembalikan. Total biaya sewa: "
                 + Format.rupiah(sewa.getTotalBiaya()));
-
     }
 
 }
