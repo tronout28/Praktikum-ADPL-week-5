@@ -19,7 +19,7 @@ public class RentalViewCli implements RentalView {
         System.out.println("4. Kembalikan Kendaraan");
         System.out.println("5. Riwayat Pesanan");
         System.out.println("0. Keluar");
-        return bacaTeks("Pilih menu: ");
+        return bacaTeks("Pilih menu");
     }
 
     @Override
@@ -32,10 +32,10 @@ public class RentalViewCli implements RentalView {
             for (Kendaraan k : daftar) {
                 System.out.println(
                         "Plat Nomor: " + k.getPlatNomor() +
-                                "| Merk: " + k.getMerk() +
-                                "| Jenis: " + k.getJenis() +
-                                "| Tarif Per Hari: " + Format.rupiah(k.getTarifPerHari()) +
-                                "| Tersedia: " + (k.isTersedia() ? "Ya" : "Tidak"));
+                                " | Merk: " + k.getMerk() +
+                                " | Jenis: " + k.getJenis() +
+                                " | Tarif Per Hari: " + Format.rupiah(k.getTarifPerHari()) +
+                                " | Tersedia: " + (k.isTersedia() ? "Ya" : "Tidak"));
             }
         }
     }
@@ -50,11 +50,11 @@ public class RentalViewCli implements RentalView {
             for (Penyewaan p : daftar) {
                 System.out.println(
                         "ID: " + p.getId() +
-                                "| Nama Penyewa: " + p.getNamaPenyewa() +
-                                "| Kendaraan: " + p.getKendaraan().getMerk() +
-                                " (" + p.getKendaraan().getPlatNomor() + ")| Lama Sewa: " + p.getLamaHari() +
-                                " hari| Total Biaya: " + Format.rupiah(p.getTotalBiaya()) +
-                                "| Aktif: " + (p.isAktif() ? "Berjalan" : "Selesai"));
+                                " | Nama Penyewa: " + p.getNamaPenyewa() +
+                                " | Kendaraan: " + p.getKendaraan().getMerk() +
+                                " (" + p.getKendaraan().getPlatNomor() + ") | Lama Sewa: " + p.getLamaHari() +
+                                " hari | Total Biaya: " + Format.rupiah(p.getTotalBiaya()) +
+                                " | Aktif: " + (p.isAktif() ? "Berjalan" : "Selesai"));
             }
         }
     }
@@ -83,9 +83,9 @@ public class RentalViewCli implements RentalView {
 
     @Override
     public boolean konfirmasiUangJaminan(long nominal) {
-        tampilkanPesan("Kendaraan ini memerlukan Uang jaminan"
+        tampilkanPesan("Kendaraan ini memerlukan uang jaminan sebesar "
                 + Format.rupiah(nominal)
-                + "(digunakan saat kendaraan dikembalikan)");
+                + " (akan dikembalikan saat kendaraan selesai disewa).");
 
         return bacaTeks("Setuju? (Y/N)").equalsIgnoreCase("Y");
     }
